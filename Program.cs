@@ -25,6 +25,7 @@ builder.Host.UseSerilog();
 // Add services to the container
 builder.Services.AddControllers(options =>
 {
+    // Add global filters for enhanced error handling and validation
     options.Filters.Add<GlobalExceptionFilter>();
     options.Filters.Add<ValidationFilter>();
 });
@@ -51,7 +52,7 @@ builder.Services.AddSwaggerGen(c =>
     { 
         Title = "Bharuwa ERP FMS API", 
         Version = "v1",
-        Description = "Financial Management System API for Bharuwa ERP"
+        Description = "Financial Management System API for Bharuwa ERP - Enhanced with modern features"
     });
     
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -79,7 +80,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configure authentication
+// Configure authentication (keeping your existing BasicAuthentication)
+// Note: Your existing BasicAuthentication will still work alongside JWT if needed
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -96,10 +98,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Register application services
+// Register your existing services
 builder.Services.AddScoped<IDbContext, DbContext>();
 builder.Services.AddScoped<IInitialDal, InitialDal>();
 builder.Services.AddScoped<LoginHelper>();
+
+// Register enhanced services
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
@@ -139,7 +143,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigins");
 
-// Add custom middleware
+// Add custom middleware for enhanced logging and monitoring
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<PerformanceMonitoringMiddleware>();
 
@@ -151,7 +155,7 @@ app.MapHealthChecks("/health");
 
 try
 {
-    Log.Information("Starting Bharuwa ERP FMS API");
+    Log.Information("Starting Bharuwa ERP FMS API with enhanced features");
     app.Run();
 }
 catch (Exception ex)
